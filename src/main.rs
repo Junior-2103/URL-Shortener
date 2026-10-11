@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use sqlx::{Pool, Row, Sqlite, sqlite::SqlitePoolOptions};
 use tokio::net::TcpListener;
+use tower_http::services::ServeDir;
 use uuid::Uuid;
 
 #[tokio::main]
@@ -31,6 +32,7 @@ async fn main() {
     let router = Router::new()
         .route("/shorten", post(shorten))
         .route("/link/{uuid}", get(link))
+        .fallback_service(ServeDir::new("./static"))
         .with_state(pool);
 
     let listener = TcpListener::bind("0.0.0.0:8080").await.unwrap();
