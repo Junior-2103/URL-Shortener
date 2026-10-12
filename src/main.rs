@@ -11,6 +11,11 @@ use tokio::net::TcpListener;
 use tower_http::services::ServeDir;
 use uuid::Uuid;
 
+#[derive(Deserialize, Serialize)]
+struct Url {
+    url: String,
+}
+
 #[tokio::main]
 async fn main() {
     let pool = SqlitePoolOptions::new()
@@ -40,9 +45,13 @@ async fn main() {
     axum::serve(listener, router).await.unwrap();
 }
 
-#[derive(Deserialize, Serialize)]
-struct Url {
-    url: String,
+async fn url_exists(pool: &Pool<Sqlite>, url: &Url) -> Option<String> {
+    let res = sqlx::query("SELECT uuid FROM urls WHERE url = ?")
+        .bind(url.url.to_string())
+        .fetch_one(pool)
+        .await;
+
+    res.ok().map(|res| res.get("uuid"))
 }
 
 async fn shorten(
@@ -50,6 +59,10 @@ async fn shorten(
     Json(url): Json<Url>,
 ) -> (StatusCode, Json<Value>) {
     let uuid = Uuid::new_v4();
+
+    if let Some(link_uuid) = url_exists(&pool, &url).await {
+        return (StatusCode::CONFLICT, Json(json!({"link_uuid":link_uuid})));
+    }
 
     sqlx::query("INSERT INTO urls VALUES (?, ?)")
         .bind(uuid.to_string())
