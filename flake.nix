@@ -20,6 +20,8 @@
             clippy
             openssl
             pkg-config
+            docker
+            docker-compose
           ];
         };
     };
