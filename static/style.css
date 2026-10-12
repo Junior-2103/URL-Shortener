@@ -14,14 +14,15 @@ body {
 
 h1 {
   color: #ffffe3;
-  font-size: 4em;
+  font-size: clamp(2rem, 8dvw, 4rem);
   margin: 18px;
 }
 
 form {
   background: #182129;
   height: 40dvh;
-  width: 30dvw;
+  max-width: 80dvw;
+  min-width: 40dvw;
   padding: 18px;
   display: flex;
   align-items: center;
@@ -53,7 +54,7 @@ form button {
 
 #link {
   color: #ffffe3;
-  font-size: 14px;
+  font-size: clamp(0.8rem, 2dvw, 1rem);
 }
 
 #link a {
