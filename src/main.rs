@@ -2,6 +2,7 @@ use axum::{
     Json, Router,
     extract::{Path, State},
     http::StatusCode,
+    response::Redirect,
     routing::{get, post},
 };
 use serde::{Deserialize, Serialize};
@@ -76,7 +77,7 @@ async fn shorten(
     )
 }
 
-async fn link(State(pool): State<Pool<Sqlite>>, Path(uuid): Path<String>) -> Json<Value> {
+async fn link(State(pool): State<Pool<Sqlite>>, Path(uuid): Path<String>) -> Redirect {
     let row = sqlx::query("SELECT url FROM urls WHERE uuid = ?")
         .bind(uuid)
         .fetch_one(&pool)
@@ -85,5 +86,5 @@ async fn link(State(pool): State<Pool<Sqlite>>, Path(uuid): Path<String>) -> Jso
 
     let url: String = row.get("url");
 
-    Json(json!({"link":url}))
+    Redirect::permanent(url.as_str())
 }
