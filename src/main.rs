@@ -21,7 +21,7 @@ struct Url {
 async fn main() {
     let pool = SqlitePoolOptions::new()
         .max_connections(5)
-        .connect("sqlite://data/urls.db?mode=rwc")
+        .connect("sqlite:///data/urls.db?mode=rwc")
         .await
         .unwrap();
 
